@@ -1,6 +1,8 @@
-﻿public class Production {
+﻿using System.Collections.Generic;
 
-    Graph lhSide, rhSide;
+public class Production {
+
+    Graph lhSide, rhSide, matchedSubGraph;
     string label;
 
     public Production(Graph lhSide, Graph rhSide, string label) {
@@ -9,10 +11,34 @@
         this.label = label;
     }
 
+    public Graph MatchedSubGraph {
+        get {
+            return matchedSubGraph;
+        }
 
-    public Graph Match() {
-        return null;
+        set {
+            matchedSubGraph = value;
+        }
+    }
+
+    public Graph LhSide{
+        get {
+            return lhSide;
+        }
+    }
+
+    public Graph RhSide {
+        get {
+            return rhSide;
+        }
+    }
+
+    public string Label {
+        get {
+            return label;
+        }
     }
 
 
 }
+    

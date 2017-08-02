@@ -1,47 +1,79 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class GGS {
 
     Graph graph;
     List<SingleProduciton> singleProductions;
+    List<Production> matchedProds;
+
+    public void Start() {
+        Init();
+    }
 
     public GGS() {
         Init();
-        GenProducitons();
     }
 
     private void Init() {
         graph = new Graph();
         singleProductions = new List<SingleProduciton>();
+        matchedProds = new List<Production>();
     }
 
-    //----------------Temp Producitons-----------------//
-    private void GenProducitons() {
-        Graph lhs = new Graph();
-        Node start = new Node("Start", "S", new Position(0, 0, 0));
-        lhs.AddNode(start);
+    public bool IsMatch(Graph host, Production production) {
+        List<Graph> possibleMatches = new List<Graph>();
+        Graph lhSide = production.LhSide;
+        List<Node> matchedNodes = FindNodes(host, lhSide);
 
-        Graph rhs = new Graph();
-        Node A = new Node("A", "S", new Position(1, 0, 0));
-        Node B = new Node("B", "S", new Position(1, 0, 1));
-        Node C = new Node("C", "S", new Position(0, 0, 1));
+        if (matchedNodes.Count <= production.LhSide.Nodes.Count)
+            return false;
 
-        Edge AB = new Edge(A, B);
-        Edge BC = new Edge(B, C);
-        Edge CA = new Edge(C, A);
+        Graph matchedSubGraph = new Graph();
 
-        rhs.AddNode(A);
-        rhs.AddNode(B);
-        rhs.AddNode(C);
-
-        rhs.AddEdge(AB);
-        rhs.AddEdge(BC);
-        rhs.AddEdge(CA);
-
-        SingleProduciton temp1 = new SingleProduciton(lhs, rhs, "Triangle");
-        singleProductions.Add(temp1);
+        foreach (Node lNode in lhSide.Nodes) {
+            List<Node> lLinks = lNode
+        }
 
 
+        return true;
+    }
+
+    private List<List<Node>> FindNodes(Graph host, Graph lhSide) {
+        List<List<Node>> matchedNodes = new List<List<Node>>();
+        int iCount = 0;
+        
+        foreach (Node node in lhSide.Nodes)
+            foreach (Node hNode in host.Nodes) {
+                if (node.Type == hNode.Type) 
+                    matchedNodes[iCount].Add(hNode);
+                ++iCount;
+                }
+
+        for (int i = 0; i < matchedNodes.Count; ++i) {
+            List<Node> nodes = matchedNodes[i];
+
+            for (int k = 0; k < nodes.Count; ++k) {
+                for
+            }
+            iCount = 0;
+
+        }
+     
+        return matchedNodes;
+    }
+
+    private bool Contains(List<Node> nodes, Node node) {
+        foreach (Node sNode in nodes) {
+            if (node == sNode)
+                return true;
+        }
+
+        return false;
+    }
+
+    private bool Contains(List<List<Node>> existingCombos, List<Node> newCombo) {
+        
     }
 
 }

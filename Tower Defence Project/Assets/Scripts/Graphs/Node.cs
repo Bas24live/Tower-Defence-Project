@@ -10,6 +10,14 @@
         this.position = position;
     }
 
+    public void Shift(Position amount) {
+        position.X += amount.X;
+        position.Y += amount.Y;
+        position.Z += amount.Z;
+    }
+
+    //--------------------------Accessors Methods--------------------------//
+
     public Position Position {
         get {
             return position;

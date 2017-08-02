@@ -23,6 +23,8 @@ public class Edge {
         edgeType = EdgeType.BI_DIRECTIONAL;
     }
 
+    //--------------------------Accessors Methods--------------------------//
+
     public Node Source {
         get {
             return source;
@@ -42,5 +44,4 @@ public class Edge {
             target = value;
         }
     }
-
 }

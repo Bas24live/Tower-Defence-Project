@@ -18,9 +18,9 @@ public class Graph {
         edges.Add(edge);
     }
 
-    public bool removeNode (string label) {
+    public bool RemoveNode (string label, string type) {
         foreach (Node node in nodes) {
-            if (node.Label == label) {
+            if (node.Label == label && node.Type == type) {
                 nodes.Remove(node);
                 return true;
             }
@@ -29,7 +29,7 @@ public class Graph {
         return false;
     }
 
-    public bool removeEdge (Node source, Node target) {
+    public bool RemoveEdge (Node source, Node target) {
         foreach (Edge edge in edges) {
             if (edge.Source == source && edge.Target == target) {
                 edges.Remove(edge);
@@ -40,11 +40,27 @@ public class Graph {
         return false;
     }
 
-    public bool findMatch () {
+    public bool ApplyProduciton () {
         return false;
     }
 
-    public bool applyProduciton () {
-        return false;
+    public void ClearNodes() {
+        nodes = new List<Node>();
+    }
+
+    public void ClearEdges() {
+        edges = new List<Edge>();
+    }
+
+    public List<Node> Nodes {
+        get {
+            return nodes;
+        }
+    }
+
+    public List<Edge> Edges {
+        get {
+            return edges;
+        }
     }
 }
