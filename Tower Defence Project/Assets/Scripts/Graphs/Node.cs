@@ -4,7 +4,7 @@
     private Position position;
     private string label;
 
-    public Node (string label, string type, Position position) {
+    public Node(string label, string type, Position position) {
         this.label = label;
         this.type = type;
         this.position = position;

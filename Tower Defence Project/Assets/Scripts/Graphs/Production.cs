@@ -2,34 +2,36 @@
 
 public class Production {
 
-    Graph lhSide, rhSide, matchedSubGraph;
+    Graph leftSide, rightSide;
+    List<Graph> matchedSubgraphs;
+    List<List<Node>> candidates;
     string label;
 
-    public Production(Graph lhSide, Graph rhSide, string label) {
-        this.lhSide = lhSide;
-        this.rhSide = rhSide;
+    public Production(Graph leftSide, Graph rightSide, string label) {
+        this.leftSide = leftSide;
+        this.rightSide = rightSide;
         this.label = label;
     }
 
-    public Graph MatchedSubGraph {
+    public List<Graph> MatchedSubgraphs {
         get {
-            return matchedSubGraph;
+            return matchedSubgraphs;
         }
 
         set {
-            matchedSubGraph = value;
+            matchedSubgraphs = value;
         }
     }
 
-    public Graph LhSide{
+    public Graph LeftSide{
         get {
-            return lhSide;
+            return leftSide;
         }
     }
 
-    public Graph RhSide {
+    public Graph RightSide {
         get {
-            return rhSide;
+            return rightSide;
         }
     }
 
@@ -39,6 +41,14 @@ public class Production {
         }
     }
 
+    public List<List<Node>> Candidates {
+        get {
+            return candidates;
+        }
 
+        set {
+            candidates = value;
+        }
+    }
 }
     

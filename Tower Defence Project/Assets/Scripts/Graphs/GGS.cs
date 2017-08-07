@@ -2,7 +2,6 @@
 using UnityEngine;
 
 public class GGS {
-
     Graph graph;
     List<SingleProduciton> singleProductions;
     List<Production> matchedProds;
@@ -16,64 +15,104 @@ public class GGS {
     }
 
     private void Init() {
-        graph = new Graph();
+        graph = new Graph ();
         singleProductions = new List<SingleProduciton>();
         matchedProds = new List<Production>();
     }
 
-    public bool IsMatch(Graph host, Production production) {
-        List<Graph> possibleMatches = new List<Graph>();
-        Graph lhSide = production.LhSide;
-        List<Node> matchedNodes = FindNodes(host, lhSide);
+    /* Check if production matches an subgraphs of the host graph.
+     * Return true if at least one match is found.
+     */
+    public bool HasCandidates(Graph host, Production production) {
+        List<List<Node>> matchedNodes = FindNodes(host.Nodes, production.LeftSide.Nodes);
+        List<List<Node>> combonations = new List<List<Node>>();
+        GenCombonations(matchedNodes, new List<Node>(), combonations, 0);
 
-        if (matchedNodes.Count <= production.LhSide.Nodes.Count)
-            return false;
+        //Remove combonations that don't have the same amount of nodes as in the left hand side
+        for(int i = 0; i < combonations.Count; ++i) {
+            List<Node> combonation = combonations[i];
 
-        Graph matchedSubGraph = new Graph();
-
-        foreach (Node lNode in lhSide.Nodes) {
-            List<Node> lLinks = lNode
+            if (combonation.Count != production.LeftSide.Nodes.Count) {
+                combonations.RemoveAt(i);
+                --i;
+            }
+            else 
+                if(!ValidCombonation(production.LeftSide, host, combonation)) {
+                    combonations.RemoveAt(i);
+                    --i;
+                }
         }
 
-
-        return true;
+        if (combonations.Count == 0)
+            return false;
+        else {
+            production.Candidates = combonations;
+            return true;
+        }
     }
 
-    private List<List<Node>> FindNodes(Graph host, Graph lhSide) {
+    /* Find all nodes in host graph that match with nodes in the productions
+     * left hand side and add them to a list. 
+     */
+    private List<List<Node>> FindNodes(List<Node> hostNodes, List<Node> leftSide) {
         List<List<Node>> matchedNodes = new List<List<Node>>();
         int iCount = 0;
-        
-        foreach (Node node in lhSide.Nodes)
-            foreach (Node hNode in host.Nodes) {
-                if (node.Type == hNode.Type) 
-                    matchedNodes[iCount].Add(hNode);
-                ++iCount;
-                }
 
-        for (int i = 0; i < matchedNodes.Count; ++i) {
-            List<Node> nodes = matchedNodes[i];
-
-            for (int k = 0; k < nodes.Count; ++k) {
-                for
+        foreach (Node leftNode in leftSide) {
+            foreach (Node hostNode in hostNodes) { 
+                if (leftNode.Type == hostNode.Type)
+                    matchedNodes[iCount].Add(hostNode);
             }
-            iCount = 0;
-
+            ++iCount;
         }
      
         return matchedNodes;
     }
 
-    private bool Contains(List<Node> nodes, Node node) {
-        foreach (Node sNode in nodes) {
-            if (node == sNode)
-                return true;
+    // Generate a list of all possible combonations of nodes without repeating existing combinations.
+    private void GenCombonations(List<List<Node>> matchedNodes, List<Node> curNodes, List<List<Node>> combonations, int iCount) {
+        for (int i = 0; i < matchedNodes[iCount].Count; ++i) {
+
+            if (!Contains(curNodes, matchedNodes[iCount][i])) {
+                curNodes.Add(matchedNodes[iCount][i]);
+
+                if (iCount < matchedNodes.Count - 1) {
+                    GenCombonations(matchedNodes, curNodes, matchedNodes, ++iCount);
+                    curNodes.RemoveAt(curNodes.Count - 1);
+                    --iCount;
+                }
+                else {
+                    List<Node> clone = new List<Node>(curNodes);
+                    combonations.Add(clone);
+                    curNodes.RemoveAt(curNodes.Count - 1);
+                }
+            }
         }
+    }
+
+    //Check if the list contains the given node
+    private bool Contains(List<Node> list, Node newNode) {
+        foreach (Node node in list)
+            if (newNode == node)
+                return true;
 
         return false;
     }
 
-    private bool Contains(List<List<Node>> existingCombos, List<Node> newCombo) {
-        
-    }
+    //Check that all edges in the produciton are contained in the combonation else combonation is not usable
+    private bool ValidCombonation(Graph leftSide, Graph host, List<Node> combination) {
+        List<Node> leftNodes = leftSide.Nodes;
 
+        for (int i = 0; i < leftNodes.Count - 1; ++i)
+            for (int j = i + 1; j < leftNodes.Count; ++j) {
+                if (leftSide.DoesEdgeExist(leftNodes[i], leftNodes[j]) || leftSide.DoesEdgeExist(leftNodes[j], leftNodes[i]))
+                    if (host.DoesEdgeExist(combination[i], combination[j]) || host.DoesEdgeExist(combination[j], combination[i]))
+                        continue;
+                    else
+                        return false;
+                        
+            }
+
+        return true;
+    }
 }
