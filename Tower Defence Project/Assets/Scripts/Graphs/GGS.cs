@@ -2,8 +2,8 @@
 using UnityEngine;
 
 public class GGS {
-    Graph graph;
-    List<SingleProduciton> singleProductions;
+    Graph host;
+    List<Production> productions;
     List<Production> matchedProds;
 
     public void Start() {
@@ -15,9 +15,15 @@ public class GGS {
     }
 
     private void Init() {
-        graph = new Graph ();
-        singleProductions = new List<SingleProduciton>();
+        host = new Graph ();    
+        productions = new List<Production>();
         matchedProds = new List<Production>();
+
+        for (int i = 0; i < productions.Count; ++i)
+            if (!HasCandidates(host, productions[i])) {
+                productions.RemoveAt(i);
+                --i;
+            }
     }
 
     /* Check if production matches an subgraphs of the host graph.
@@ -26,6 +32,7 @@ public class GGS {
     public bool HasCandidates(Graph host, Production production) {
         List<List<Node>> matchedNodes = FindNodes(host.Nodes, production.LeftSide.Nodes);
         List<List<Node>> combonations = new List<List<Node>>();
+        List<Graph> candidateGraphs = new List<Graph>();
         GenCombonations(matchedNodes, new List<Node>(), combonations, 0);
 
         //Remove combonations that don't have the same amount of nodes as in the left hand side
@@ -36,17 +43,21 @@ public class GGS {
                 combonations.RemoveAt(i);
                 --i;
             }
-            else 
-                if(!ValidCombonation(production.LeftSide, host, combonation)) {
+            else {
+                List<Edge> connectedEdges = GetConnectedEdges();
+                if (!ValidCombonation(production.LeftSide, combonation, connectedEdges)) {
                     combonations.RemoveAt(i);
                     --i;
+                } else {
+                    candidateGraphs.Add(new Graph(combonations[i], connectedEdges));
                 }
+            }
         }
 
-        if (combonations.Count == 0)
+        if (candidateGraphs.Count == 0)
             return false;
         else {
-            production.Candidates = combonations;
+            production.CandidateGraphs = candidateGraphs;
             return true;
         }
     }
@@ -99,20 +110,58 @@ public class GGS {
         return false;
     }
 
-    //Check that all edges in the produciton are contained in the combonation else combonation is not usable
-    private bool ValidCombonation(Graph leftSide, Graph host, List<Node> combination) {
-        List<Node> leftNodes = leftSide.Nodes;
+    private List<Edge> GetConnectedEdges() {
+        List<Edge> connectedEdges = new List<Edge>();
 
-        for (int i = 0; i < leftNodes.Count - 1; ++i)
-            for (int j = i + 1; j < leftNodes.Count; ++j) {
-                if (leftSide.DoesEdgeExist(leftNodes[i], leftNodes[j]) || leftSide.DoesEdgeExist(leftNodes[j], leftNodes[i]))
-                    if (host.DoesEdgeExist(combination[i], combination[j]) || host.DoesEdgeExist(combination[j], combination[i]))
-                        continue;
-                    else
-                        return false;
-                        
+        //Add all edges that are connected to the nodes in the combination list
+        foreach (Node node in host.Nodes) {
+            foreach (Edge edge in host.GetEdges(node)) {
+                bool exists = false;
+                foreach (Edge existingEdge in connectedEdges) {
+                    if (edge == existingEdge) {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists)
+                    connectedEdges.Add(edge);
             }
+        }
+
+        return connectedEdges;
+    }
+
+    //Check that all edges in the produciton are contained in the combonation else combonation is not usable
+    private bool ValidCombonation(Graph leftSide, List<Node> combination, List<Edge> connectedEdges) {
+        List<Node> leftNodes = leftSide.Nodes;        
+
+        //Check whether a combination is valid by comparing the edges in the left hand side and those in the subgraph
+        for (int i = 0; i < leftNodes.Count - 1; ++i) {
+            for (int j = i + 1; j < leftNodes.Count; ++j) {
+                if (leftSide.DoesEdgeExist(leftNodes[i], leftNodes[j]) || leftSide.DoesEdgeExist(leftNodes[j], leftNodes[i])) {
+                    bool edgeExists = false;
+                    for (int k = 0; k < connectedEdges.Count; ++k) {
+                        if (DoesEdgeExist(connectedEdges[k], combination[i], combination[j])) {
+                            connectedEdges.RemoveAt(k);
+                            edgeExists = true;
+                            break;
+                        }
+                    }
+                    if (!edgeExists)
+                        return false;
+                }
+            }
+        }
+
 
         return true;
+    }
+
+    //Check if the given edge is connected between the two given nodes.
+    private bool DoesEdgeExist (Edge edge, Node node1, Node node2) {
+    if (edge.Source == node1 && edge.Target == node2 || edge.Source == node2 && edge.Target == node1)
+        return true;
+
+    return false;
     }
 }

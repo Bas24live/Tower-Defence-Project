@@ -3,24 +3,13 @@
 public class Production {
 
     Graph leftSide, rightSide;
-    List<Graph> matchedSubgraphs;
-    List<List<Node>> candidates;
+    List<Graph> candidateGraphs;
     string label;
 
     public Production(Graph leftSide, Graph rightSide, string label) {
         this.leftSide = leftSide;
         this.rightSide = rightSide;
         this.label = label;
-    }
-
-    public List<Graph> MatchedSubgraphs {
-        get {
-            return matchedSubgraphs;
-        }
-
-        set {
-            matchedSubgraphs = value;
-        }
     }
 
     public Graph LeftSide{
@@ -41,13 +30,13 @@ public class Production {
         }
     }
 
-    public List<List<Node>> Candidates {
+    public List<Graph> CandidateGraphs {
         get {
-            return candidates;
+            return candidateGraphs;
         }
 
         set {
-            candidates = value;
+            candidateGraphs = value;
         }
     }
 }

@@ -10,6 +10,11 @@ public class Graph {
         edges = new List<Edge>();
     }
 
+    public Graph(List<Node> nodes, List<Edge> edges) {
+        this.nodes = nodes;
+        this.edges = edges;
+    }
+
     public void AddNode(Node node) {
         nodes.Add(node);
     }
@@ -53,10 +58,10 @@ public class Graph {
     }
 
 
-    public List<Edge> GetEdges(Node source) {
+    public List<Edge> GetEdges(Node node) {
         List<Edge> existingEdges = new List<Edge>();
         foreach (Edge edge in edges) {
-            if (edge.Source == source)
+            if (edge.Source == node || edge.Target == node)
                 existingEdges.Add(edge);
         }
 
@@ -78,11 +83,19 @@ public class Graph {
         get {
             return nodes;
         }
+
+        set {
+            nodes = value;
+        }
     }
 
     public List<Edge> Edges {
         get {
             return edges;
+        }
+
+        set {
+            edges = value;
         }
     }
 }
