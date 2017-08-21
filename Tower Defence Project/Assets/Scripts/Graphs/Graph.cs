@@ -1,31 +1,46 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
 
+[Serializable]
 public class Graph {
+    private string label;
+    private List<Node> nodes;
+    private List<Edge> edges;
 
-    List<Node> nodes;
-    List<Edge> edges;
-
-    public Graph() {
+    public Graph () {
         nodes = new List<Node>();
         edges = new List<Edge>();
     }
 
-    public Graph(List<Node> nodes, List<Edge> edges) {
+    public Graph (string label) {
+        nodes = new List<Node>();
+        edges = new List<Edge>();
+    }
+
+    public Graph (List<Node> nodes, List<Edge> edges) {
         this.nodes = nodes;
         this.edges = edges;
     }
 
-    public void AddNode(Node node) {
+    public Graph (List<Node> nodes, List<Edge> edges, string label) {
+        this.nodes = nodes;
+        this.edges = edges;
+        this.label = label;
+    }
+
+    //Adds a node to the list of nodes contained in this graph
+    public void AddNode (Node node) {
         nodes.Add(node);
     }
 
-    public void AddEdge(Edge edge) {
-        edges.Add(edge);
-    }
-
-    public bool RemoveNode(string label, string type) {
-        foreach (Node node in nodes) {
-            if (node.Label == label && node.Type == type) {
+    /* Removes a given node from the list of nodes in the graph
+     * returns true if the node was found and removed
+     * returns false if the node was not found and removed
+     */
+    public bool RemoveNode (Node node) {
+        foreach (Node gNode in nodes) {
+            if (gNode.Compare(node)) {
                 nodes.Remove(node);
                 return true;
             }
@@ -34,9 +49,17 @@ public class Graph {
         return false;
     }
 
-    public bool RemoveEdge(Node source, Node target) {
+    //Adds an edge to the list of edges contained in this graph
+    public void AddEdge (Edge edge) {
+        edges.Add(edge);
+    }
+    /* Removes a given edge from the list of edges in the graph
+     * returns true if the edge was found and removed
+     * returns false if the edge was not found and removed
+     */
+    public bool RemoveEdge (Node source, Node target) {
         foreach (Edge edge in edges) {
-            if (edge.Source == source && edge.Target == target) {
+            if (edge.Source.Compare(source) && edge.Target.Compare(target)) {
                 edges.Remove(edge);
                 return true;
             }
@@ -45,32 +68,36 @@ public class Graph {
         return false;
     }
 
-    public bool ApplyProduciton() {
-        return false;
+    //Remove all nodes from the graph
+    public void ClearNodes () {
+        nodes.Clear();
     }
 
-    public void ClearNodes() {
-        nodes = new List<Node>();
+    //Remove all edges from the graph
+    public void ClearEdges () {
+        edges.Clear();
     }
 
-    public void ClearEdges() {
-        edges = new List<Edge>();
-    }
-
-
-    public List<Edge> GetEdges(Node node) {
+    /* Finds all edges that are connected to the given node
+     * returns a list of edges that have the given node as either a source or target node
+     */
+    public List<Edge> GetEdges (Node node) {
         List<Edge> existingEdges = new List<Edge>();
+
         foreach (Edge edge in edges) {
-            if (edge.Source == node || edge.Target == node)
+            if (edge.Source.Compare(node) || edge.Target.Compare(node))
                 existingEdges.Add(edge);
         }
 
         return existingEdges;
     }
 
-    public bool DoesEdgeExist(Node source, Node target) {
+    /* Checks whether there is an edge linking the given source and target nodes
+     * returns the result
+     */
+    public bool DoesEdgeExist (Node source, Node target) {
         foreach(Edge edge in edges) {
-            if (edge.Source == source && edge.Target == target)
+            if (edge.Source.Compare(source) && edge.Target.Compare(target))
                 return true;
         }
 
@@ -97,5 +124,28 @@ public class Graph {
         set {
             edges = value;
         }
+    }
+
+    public string Label {
+        get {
+            return label;
+        }
+
+        set {
+            label = value;
+        }
+    }
+
+    //-----------------------------Serialization Methods-----------------------------//
+    public void GetObjectData (SerializationInfo info, StreamingContext context) {
+        info.AddValue("label", label);
+        info.AddValue("nodes", nodes);
+        info.AddValue("edges", edges);
+    }
+
+    public Graph (SerializationInfo info, StreamingContext context) {
+        label = (string)info.GetValue("label", typeof(string));
+        nodes = (List<Node>)info.GetValue("nodes", typeof(List<Node>));
+        edges = (List<Edge>)info.GetValue("edges", typeof(List<Edge>));
     }
 }

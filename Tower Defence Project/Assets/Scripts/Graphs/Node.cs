@@ -1,23 +1,35 @@
-﻿public class Node {
+﻿using System;
+using System.Runtime.Serialization;
 
-    private string ID, type;
+[Serializable]
+public class Node : ISerializable {
+    private string id, label, type;
     private Position position;
-    private string label;
 
-    public Node(string label, string type, Position position) {
+    public Node (string id, string label, string type, Position position) {
+        this.id = id;
         this.label = label;
         this.type = type;
         this.position = position;
     }
 
-    public void Shift(Position amount) {
+    public Node (string label, string type, Position position) {
+        this.label = label;
+        this.type = type;
+        this.position = position;
+    }
+
+    public void Shift (Position amount) {
         position.X += amount.X;
         position.Y += amount.Y;
         position.Z += amount.Z;
     }
 
-    //--------------------------Accessors Methods--------------------------//
+    public bool Compare (Node node) {
+        return node.id == id;
+    }
 
+    //------------------------------Accessors Methods------------------------------//
     public Position Position {
         get {
             return position;
@@ -46,5 +58,22 @@
         set {
             type = value;
         }
+    }
+    
+
+    //-----------------------------Serialization Methods-----------------------------//
+    public void GetObjectData (SerializationInfo info, StreamingContext context) {
+        info.AddValue("label", label);
+        info.AddValue("id", id);
+        info.AddValue("type", type);
+        info.AddValue("position", position);
+    }
+
+    public Node (SerializationInfo info, StreamingContext context) {
+        label = (string)info.GetValue("label", typeof(string));
+        id = (string)info.GetValue("id", typeof(string));
+        type = (string)info.GetValue("type", typeof(string));
+        position = (Position)info.GetValue("position", typeof(Position));
+
     }
 }

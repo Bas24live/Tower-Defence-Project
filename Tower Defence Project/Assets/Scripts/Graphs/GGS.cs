@@ -1,41 +1,71 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
 
 public class GGS {
-    Graph host;
-    List<Production> productions;
-    List<Production> matchedProds;
 
-    public void Start() {
-        Init();
+    private static GGS instance = null;
+
+    private Graph host;
+    private List<Production> productions;
+    private List<Production> matchedProductions;
+
+    protected GGS () {
+
     }
 
-    public GGS() {
-        Init();
+    public static GGS GetInstance () {
+        if (instance == null)
+            instance = new GGS();
+        
+        return instance;
     }
 
-    private void Init() {
+    //Generate or read in required variables
+    private void Init () {
         host = new Graph ();    
         productions = new List<Production>();
-        matchedProds = new List<Production>();
+        matchedProductions = new List<Production>();
+    }
 
-        for (int i = 0; i < productions.Count; ++i)
+    public bool Run () {
+        Random random = new Random();
+
+        while (ValidProducations()) {
+            int i = random.Next(matchedProductions.Count);
+            matchedProductions[i].ApplyToRandom();
+        }
+
+        return true;
+    }
+
+    /* Check if there are any valid productions that can be applied to the host graph*/
+    private bool ValidProducations () {
+        //Release any left over elements and reallocate memory to save space 
+        matchedProductions.Clear();
+        matchedProductions.TrimExcess();
+
+        for (int i = 0; i < productions.Count; ++i) {
             if (!HasCandidates(host, productions[i])) {
-                productions.RemoveAt(i);
-                --i;
+                matchedProductions.Add(productions[i]);
             }
+        }
+
+        if (matchedProductions.Count == 0)
+            return false;
+        else
+            return true;
     }
 
     /* Check if production matches an subgraphs of the host graph.
      * Return true if at least one match is found.
      */
-    public bool HasCandidates(Graph host, Production production) {
+    public bool HasCandidates (Graph host, Production production) {
         List<List<Node>> matchedNodes = FindNodes(host.Nodes, production.LeftSide.Nodes);
         List<List<Node>> combonations = new List<List<Node>>();
         List<Graph> candidateGraphs = new List<Graph>();
         GenCombonations(matchedNodes, new List<Node>(), combonations, 0);
 
-        //Remove combonations that don't have the same amount of nodes as in the left hand side
+        
         for(int i = 0; i < combonations.Count; ++i) {
             List<Node> combonation = combonations[i];
 
@@ -65,7 +95,7 @@ public class GGS {
     /* Find all nodes in host graph that match with nodes in the productions
      * left hand side and add them to a list. 
      */
-    private List<List<Node>> FindNodes(List<Node> hostNodes, List<Node> leftSide) {
+    private List<List<Node>> FindNodes (List<Node> hostNodes, List<Node> leftSide) {
         List<List<Node>> matchedNodes = new List<List<Node>>();
         int iCount = 0;
 
@@ -81,7 +111,7 @@ public class GGS {
     }
 
     // Generate a list of all possible combonations of nodes without repeating existing combinations.
-    private void GenCombonations(List<List<Node>> matchedNodes, List<Node> curNodes, List<List<Node>> combonations, int iCount) {
+    private void GenCombonations (List<List<Node>> matchedNodes, List<Node> curNodes, List<List<Node>> combonations, int iCount) {
         for (int i = 0; i < matchedNodes[iCount].Count; ++i) {
 
             if (!Contains(curNodes, matchedNodes[iCount][i])) {
@@ -101,8 +131,13 @@ public class GGS {
         }
     }
 
+    //Remove combonations that don't have the same amount of nodes as in the left hand side
+    private void RemoveInvalidCombonations () {
+
+    }
+    
     //Check if the list contains the given node
-    private bool Contains(List<Node> list, Node newNode) {
+    private bool Contains (List<Node> list, Node newNode) {
         foreach (Node node in list)
             if (newNode == node)
                 return true;
@@ -110,7 +145,7 @@ public class GGS {
         return false;
     }
 
-    private List<Edge> GetConnectedEdges() {
+    private List<Edge> GetConnectedEdges () {
         List<Edge> connectedEdges = new List<Edge>();
 
         //Add all edges that are connected to the nodes in the combination list
@@ -132,7 +167,7 @@ public class GGS {
     }
 
     //Check that all edges in the produciton are contained in the combonation else combonation is not usable
-    private bool ValidCombonation(Graph leftSide, List<Node> combination, List<Edge> connectedEdges) {
+    private bool ValidCombonation (Graph leftSide, List<Node> combination, List<Edge> connectedEdges) {
         List<Node> leftNodes = leftSide.Nodes;        
 
         //Check whether a combination is valid by comparing the edges in the left hand side and those in the subgraph
@@ -153,7 +188,6 @@ public class GGS {
             }
         }
 
-
         return true;
     }
 
@@ -164,4 +198,7 @@ public class GGS {
 
     return false;
     }
+
+    //--------------------------Read in XML data--------------------------//
+
 }

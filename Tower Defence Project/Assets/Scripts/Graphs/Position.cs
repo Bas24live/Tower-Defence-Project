@@ -1,4 +1,8 @@
-﻿public class Position {
+﻿using System.Runtime.Serialization;
+using System;
+
+[Serializable]
+public class Position : ISerializable{
 
     private float x, y, z;
 
@@ -7,6 +11,8 @@
         this.y = y;
         this.z = z;
     }
+
+    //----------------------------Accessor Methods----------------------------//
 
     public float X{
 
@@ -41,4 +47,17 @@
         }
     }
 
+    //----------------------------Serialization Methods----------------------------//
+
+    public void GetObjectData(SerializationInfo info, StreamingContext context) {
+        info.AddValue("x", x);
+        info.AddValue("y", y);
+        info.AddValue("z", z);
+    }
+
+    public Position(SerializationInfo info, StreamingContext context) {
+        x = (float)info.GetValue("x", typeof(float));
+        y = (float)info.GetValue("y", typeof(float));
+        z = (float)info.GetValue("z", typeof(float));
+    }
 }

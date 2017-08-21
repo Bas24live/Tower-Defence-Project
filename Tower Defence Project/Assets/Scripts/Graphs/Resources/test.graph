@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<graph>
+    <nodes>
+        <node>
+            <label>n1</label>
+            <type>default</type>
+            <position>
+                <x>0</x>
+                <y>0</y>
+                <z>0</z>
+            </position>
+        </node>
+
+        <node>
+            <label>n2</label>
+      	     <type>default</type>
+             <position>
+                <x>1</x>
+                <y>1</y>
+                <z>0</z>
+            </position>
+        </node>
+    </nodes>
+
+    <edges>
+        <edge>
+            <source>n1</source>
+            <target>n2</target>
+            <type>BI_DIRECTIONA</type>
+        </edge>
+    </edges>
+</graph>
