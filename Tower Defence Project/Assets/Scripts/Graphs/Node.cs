@@ -26,7 +26,7 @@ public class Node : ISerializable {
     }
 
     public bool Compare (Node node) {
-        return node.id == id;
+        return node.id == id && node.Type == type;
     }
 
     //------------------------------Accessors Methods------------------------------//

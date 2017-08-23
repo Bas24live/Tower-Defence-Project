@@ -37,7 +37,7 @@ public class Edge : ISerializable {
     }
 
     public bool Compare (Edge edge) {
-        return edge.id == id;
+        return edge.id == id && edge.edgeType == edgeType;
     }
 
     //----------------------------Accessors Methods----------------------------//
