@@ -10,7 +10,7 @@ public class GGS {
     private List<Production> productions;
     private List<Production> matchedProductions;
 
-    private int iterations = 10;
+    private int iterations = 1;
 
     protected GGS() {
 
@@ -30,6 +30,7 @@ public class GGS {
         matchedProductions = new List<Production>();
 
         GenHost();
+        GenProds();
     }
 
     public bool Run() {
@@ -243,14 +244,36 @@ public class GGS {
 
     //------------------------------------------------------------Gen Productions and Host------------------------------------------------------------//
     private void GenHost() {
-        Node a = new Node("000", "a", "standard", new Vector3(0, 0, 0));
+        Node a = new Node("000", "a", "start", new Vector3(0, 0, 0));
         Node b = new Node("001", "b", "standard", new Vector3(5, 0, 0));
+        Node c = new Node("002", "c", "end", new Vector3(0, 5, 0));
 
         host.AddNode(a);
         host.AddNode(b);
+        host.AddNode(c);
 
         host.AddEdge(new Edge(a, b));
+        host.AddEdge(new Edge(b, c));
 
+    }
+
+    private void GenProds() {
+        Node a = new Node("000", "a", "start", new Vector3(0, 0, 0));
+        Node b = new Node("001", "b", "standard", new Vector3(5, 0, 0));
+        Node c = new Node("002", "c", "standard", new Vector3(0, -5, 0));
+
+        Production prod = new Production("Test");
+
+        //Left side of production
+        prod.LeftSide.AddNode(a);
+        prod.LeftSide.AddNode(b);
+        prod.LeftSide.AddEdge(new Edge(a, b));
+
+        //Right side of production
+        prod.RightSide.AddNode(c);
+        prod.RightSide.AddEdge(new Edge(b, c));
+
+        productions.Add(prod);
     }
 
 }

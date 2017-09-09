@@ -8,10 +8,18 @@ public class Production {
     List<Graph> candidateGraphs;
     string label;
 
-    public Production(Graph leftSide, Graph rightSide, string label) {
+    public Production(string label) {
+        this.label = label;
+        leftSide = new Graph();
+        rightSide = new Graph();
+        candidateGraphs = new List<Graph>();
+    }
+
+    public Production(string label, Graph leftSide, Graph rightSide) {
         this.leftSide = leftSide;
         this.rightSide = rightSide;
         this.label = label;
+        candidateGraphs = new List<Graph>();
     }
 
     public bool ApplyToRandom() {

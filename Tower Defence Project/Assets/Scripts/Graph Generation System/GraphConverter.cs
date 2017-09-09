@@ -4,20 +4,22 @@ using UnityEngine;
 public class GraphConverter : MonoBehaviour {
 
     public Transform nodePrefab;
+    private Graph host;
 
     void Start () {
         GGS ggs = GGS.GetInstance();
         ggs.Run();
-
-        GenGraph(ggs.Host);
+        this.host = ggs.Host;
+        GenNodes();
+        GenEdges();
 	}
 
-	private void GenGraph(Graph graph) {
-        GenNodes(graph.Nodes);
-        GenEdges(graph.Edges);
+    private void Update() {
     }
 
-    private void GenNodes(List<Node> nodes) {
+    private void GenNodes() {
+        List<Node> nodes = host.Nodes;
+
         string containerName = "Nodes";
         Transform nodesContainer = new GameObject(containerName).transform;
         nodesContainer.parent = transform;
@@ -30,7 +32,12 @@ public class GraphConverter : MonoBehaviour {
         }
     }
 
-    void GenEdges(List<Edge> edges) {
+    void GenEdges() {
+        List<Edge> edges = host.Edges;
+
+        string containerName = "Edges";
+        Transform edgesContainer = new GameObject(containerName).transform;
+        edgesContainer.parent = transform;
 
         foreach (Edge edge in edges) {
             Node source = edge.Source;
@@ -39,13 +46,13 @@ public class GraphConverter : MonoBehaviour {
             UnityEngine.Vector3 sourcePosition = new UnityEngine.Vector3(source.Position.X, source.Position.Y, source.Position.Z);
             UnityEngine.Vector3 targetPosition = new UnityEngine.Vector3(target.Position.X, target.Position.Y, target.Position.Z);
 
-            DrawLine(sourcePosition, targetPosition, Color.red);
-
+            DrawLine(sourcePosition, targetPosition, Color.red, edgesContainer);
         }
     }
 
-    void DrawLine(UnityEngine.Vector3 start, UnityEngine.Vector3 end, Color color, float duration = 0.2f) {
+    void DrawLine(UnityEngine.Vector3 start, UnityEngine.Vector3 end, Color color, Transform container, float duration = 0.2f) {
         GameObject myLine = new GameObject();
+        myLine.transform.parent = container;
         myLine.transform.position = start;
         myLine.AddComponent<LineRenderer>();
         LineRenderer lr = myLine.GetComponent<LineRenderer>();
@@ -54,7 +61,6 @@ public class GraphConverter : MonoBehaviour {
         lr.SetWidth(0.1f, 0.1f);
         lr.SetPosition(0, start);
         lr.SetPosition(1, end);
-        GameObject.Destroy(myLine, duration);
     }
 
     
