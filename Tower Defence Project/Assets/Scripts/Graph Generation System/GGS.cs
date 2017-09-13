@@ -1,8 +1,12 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Xml.Serialization;
 using System.Collections.Generic;
 
-public class GGS {
+using UnityEngine;
+using UnityEditor;
+
+public class GGS : MonoBehaviour {
 
     private static GGS instance = null;
 
@@ -53,75 +57,105 @@ public class GGS {
     //------------------------------------------------------------Graph Gen Methods------------------------------------------------------------//
     /* Check if there are any valid productions that can be applied to the host graph*/
     private bool ValidProducations() {
+        Debug.Log("ValidProductions Started...");
         //Release any left over elements and reallocate memory to save space 
         matchedProductions.Clear();
         matchedProductions.TrimExcess();
 
         for (int i = 0; i < productions.Count; ++i) {
-            if (!HasCandidates(host, productions[i])) {
+            if (HasCandidates(host, productions[i])) {
                 matchedProductions.Add(productions[i]);
             }
         }
 
-        if (matchedProductions.Count == 0)
+        if (matchedProductions.Count == 0) {
+            Debug.Log("ValidProductions Returned False...");
             return false;
-        else
+        }
+        else {
+            Debug.Log("ValidProductions Returned True...");
             return true;
+        }
     }
 
     /* Check if production matches any subgraphs of the host graph.
      * Return true if at least one match is found.
      * */
     public bool HasCandidates(Graph host, Production production) {
+        Debug.Log("HasCandidates Started...");
         List<List<Node>> matchedNodes = FindMatchedNodes(host.Nodes, production.LeftSide.Nodes);
         List<List<Node>> combonations = new List<List<Node>>();
 
-        GenCombonations(matchedNodes, new List<Node>(), combonations, 0);
+        combonations = GenCombonations(matchedNodes, new List<Node>(), combonations, 0);
 
-        return GenCandidateGraphs(production, combonations);
+        Debug.Log("GenCombonations Returned " + combonations.Count);
+
+        bool result = GenCandidateGraphs(production, combonations);
+
+        Debug.Log("HasCandidates Returned " + result);
+        return result;
     }
 
     /* Find all nodes in host graph that match with nodes in the productions
      * left hand side and add them to a list. 
      * */
     private List<List<Node>> FindMatchedNodes(List<Node> hostNodes, List<Node> leftSide) {
+        Debug.Log("FindMatchedNodes Started...");
+
         List<List<Node>> matchedNodes = new List<List<Node>>();
-        int iCount = 0;
 
         foreach (Node leftNode in leftSide) {
+            List<Node> temp = new List<Node>();
             foreach (Node hostNode in hostNodes) {
                 if (leftNode.Type == hostNode.Type)
-                    matchedNodes[iCount].Add(hostNode);
+                    temp.Add(hostNode);
             }
-            ++iCount;
+            matchedNodes.Add(temp);
         }
+        Debug.Log("FindMatchedNodes Finished...");
 
         return matchedNodes;
     }
 
     // Generate a list of all possible combonations of nodes without repeating existing combinations.
-    private void GenCombonations(List<List<Node>> matchedNodes, List<Node> curNodes, List<List<Node>> combonations, int iCount) {
+    private List<List<Node>> GenCombonations(List<List<Node>> matchedNodes, List<Node> curNodes, List<List<Node>> combonations, int iCount) {
         for (int i = 0; i < matchedNodes[iCount].Count; ++i) {
 
             if (!DoesNodeExist(matchedNodes[iCount][i], curNodes)) {
                 curNodes.Add(matchedNodes[iCount][i]);
 
                 if (iCount < matchedNodes.Count - 1) {
-                    GenCombonations(matchedNodes, curNodes, matchedNodes, ++iCount);
+                    combonations = GenCombonations(matchedNodes, curNodes, matchedNodes, ++iCount);
                     curNodes.RemoveAt(curNodes.Count - 1);
                     --iCount;
                 }
                 else {
-                    List<Node> clone = new List<Node>(curNodes);
-                    combonations.Add(clone);
+                    List<Node> temp = new List<Node>();
+
+                    foreach (Node node in curNodes) {
+                        temp.Add(node);
+                    }
+
+                    combonations.Add(temp);
                     curNodes.RemoveAt(curNodes.Count - 1);
                 }
             }
-        }
+        } 
+        return combonations;
     }
 
     //Remove combonations that don't have the same amount of nodes as in the left hand side
     private bool GenCandidateGraphs(Production production, List<List<Node>> combonations) {
+        Debug.Log("GenCandidateGraphs Started...");
+        for (int i = 0; i < combonations.Count; ++i) {
+            string combo = "";
+            foreach (Node node in combonations[i]) {
+                combo += node.label + "|";
+            }
+
+            Debug.Log(combo);
+        }
+
         List<Graph> candidateGraphs = new List<Graph>();
 
         for (int i = 0; i < combonations.Count; ++i) {
@@ -144,9 +178,14 @@ public class GGS {
             }
         }
 
-        if (candidateGraphs.Count == 0)
+        if (candidateGraphs.Count == 0) {
+            Debug.Log("GenCandidateGraphs Returned False...");
+            Debug.Log("HasCandidates Finished...");
             return false;
+        }
         else {
+            Debug.Log("GenCandidateGraphs Returned True...");
+            Debug.Log("HasCandidates Finished...");
             production.CandidateGraphs = candidateGraphs;
             return true;
         }
@@ -156,6 +195,8 @@ public class GGS {
      * If all edges are connected in the same manner then the combination is valid and return true else return false
      * */
     private bool ValidCombonation(Graph productionLeftSide, List<Node> combination, List<Edge> internalEdges) {
+        Debug.Log("ValidCombonation Started...");
+
         List<Node> nodes = productionLeftSide.Nodes;
 
         if (productionLeftSide.Edges.Count != internalEdges.Count)
@@ -165,11 +206,14 @@ public class GGS {
             for (int j = i + 1; j < nodes.Count; ++j) {
                 if (productionLeftSide.DoesEdgeExist(nodes[i], nodes[j]) || productionLeftSide.DoesEdgeExist(nodes[j], nodes[i])) {
                     if (!DoesEdgeExist(combination[i], combination[j], internalEdges)) {
+                        Debug.Log("ValidCombonation Returned False...");
+
                         return false;
                     }
                 }
             }
         }
+        Debug.Log("ValidCombonation Returned True...");
 
         return true;
     }
