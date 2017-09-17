@@ -86,7 +86,6 @@
     <Compile Include="Assets\Scripts\Graph Generation System\GraphConverter.cs" />
     <Compile Include="Assets\Scripts\Graph Generation System\Node.cs" />
     <Compile Include="Assets\Scripts\Graph Generation System\Position.cs" />
-    <Compile Include="Assets\Scripts\Graph Generation System\ProbabilityChooser.cs" />
     <Compile Include="Assets\Scripts\Graph Generation System\Production.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

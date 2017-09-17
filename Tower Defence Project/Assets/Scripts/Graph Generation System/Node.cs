@@ -19,8 +19,12 @@ public class Node : ISerializable {
         position.Z += amount.Z;
     }
 
-    public bool Compare (Node node) {
-        return node.id == id && node.Type == type;
+    public bool CompareType(Node node) {
+        return node.Type == type;
+    }
+
+    public bool CompareExact(Node node) {
+        return node.Type == type && node.id == id;
     }
 
     //------------------------------------------------------------Accessors Methods------------------------------------------------------------//

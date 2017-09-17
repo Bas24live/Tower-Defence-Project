@@ -30,14 +30,12 @@ public class Edge : ISerializable {
         edgeType = EdgeType.BI_DIRECTIONAL;
     }
 
-    public Edge(Node source, Node target) {
-        this.source = source;
-        this.target = target;
-        edgeType = EdgeType.BI_DIRECTIONAL;
+    public bool CompareType(Edge edge) {
+        return edge.edgeType == edgeType;
     }
 
-    public bool Compare(Edge edge) {
-        return edge.id == id && edge.edgeType == edgeType;
+    public bool CompareExact(Edge edge) {
+        return edge.edgeType == edgeType && edge.source.CompareExact(source) && edge.Target.CompareExact(target);
     }
 
     //------------------------------------------------------------Accessors Methods------------------------------------------------------------//
@@ -58,6 +56,12 @@ public class Edge : ISerializable {
 
         set {
             target = value;
+        }
+    }
+
+    public string Id {
+        get {
+            return id;
         }
     }
 

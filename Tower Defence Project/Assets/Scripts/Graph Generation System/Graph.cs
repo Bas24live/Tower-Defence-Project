@@ -42,7 +42,7 @@ public class Graph {
      * */
     public bool RemoveNode(Node node) {
         foreach (Node gNode in nodes) {
-            if (gNode.Compare(node)) {
+            if (gNode.CompareType(node)) {
                 nodes.Remove(node);
                 return true;
             }
@@ -62,7 +62,7 @@ public class Graph {
      * */
     public bool RemoveEdge(Node source, Node target) {
         foreach (Edge edge in edges) {
-            if (edge.Source.Compare(source) && edge.Target.Compare(target)) {
+            if (edge.Source.CompareType(source) && edge.Target.CompareType(target)) {
                 edges.Remove(edge);
                 return true;
             }
@@ -81,6 +81,18 @@ public class Graph {
     public void ClearEdges() {
         edges.Clear();
         edges.TrimExcess();
+    }
+
+    /* Finds all edges that are connected to the given node
+     * and then removes them from the graphs list of edges
+     */
+    public void CleanEdges(Node node) {
+        for(int i = 0; i < edges.Count; ++i) {
+            if (IsConnected(node, edges[i])) {
+                edges.RemoveAt(i);
+                --i;
+            }
+        }
     }
 
     //-----------------------------------------------------------------Helpers-----------------------------------------------------------------//
@@ -138,7 +150,7 @@ public class Graph {
 
     //Checks if a given edge is attached to the given node
     public bool IsConnected(Node node, Edge edge) {
-        if (edge.Source.Compare(node) || edge.Target.Compare(node))
+        if (edge.Source.CompareType(node) || edge.Target.CompareType(node))
             return true;
         else
             return false;
@@ -147,7 +159,7 @@ public class Graph {
     //Checks if a given edge is attached to any of the nodes in the given list
     public bool IsConnected(List<Node> nodes, Edge edge) {
         foreach (Node node in nodes) {
-            if (edge.Source.Compare(node) || edge.Target.Compare(node))
+            if (edge.Source.CompareType(node) || edge.Target.CompareType(node))
                 return true;
         }
 
@@ -159,7 +171,7 @@ public class Graph {
      */
     public bool DoesEdgeExist(Node source, Node target) {
         foreach(Edge edge in edges) {
-            if (edge.Source.Compare(source) && edge.Target.Compare(target))
+            if (edge.Source.CompareType(source) && edge.Target.CompareType(target))
                 return true;
         }
 
@@ -171,11 +183,105 @@ public class Graph {
     */
     public bool DoesEdgeExist(Edge edge, List<Edge> edges) {
         foreach (Edge lEdge in edges) {
-            if (edge.Compare(lEdge))
+            if (edge.CompareType(lEdge))
                 return true;
         }
 
         return false;
+    }
+
+    /* Checks whether the given node is contained in the graphs set of nodes.
+     * Compares using the exact comparison.
+     * Returns a boolean result of the findings.
+     */
+    public bool DoesNodeExist(Node node) {
+        foreach (Node gNode in nodes) {
+            if (node.CompareExact(gNode)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /* Finds the old node in the list of existing nodes in the graph
+     * once the old node is found it is replaced with the new node.
+     * Returns a bool value indicating wether the replacement took place or not.
+     */
+    public bool Replace(Node oldNode, Node newNode) {
+        foreach (Edge edge in edges) {
+            if (edge.Source.CompareExact(oldNode)) {
+                edge.Source = newNode;
+            }
+            else if (edge.Target.CompareExact(oldNode)) {
+                edge.Target = newNode;
+            }
+        }
+
+        for (int i = 0; i < nodes.Count; ++i) {
+            if (nodes[i].CompareExact(oldNode)) {
+                nodes.RemoveAt(i);
+                nodes.Insert(i, newNode);
+                return true;
+            }
+        }       
+
+        return false;
+    }
+
+    /* Finds the old edge in the list of existing edges in the graph
+     * once the old edge is found it is replaced with the new edge.
+     * Returns a bool value indicating wether the replacement took place or not.
+     */
+    public bool Replace(Edge oldEdge, Edge newEdge) {
+        for (int i = 0; i < edges.Count; ++i) {
+            if (edges[i].CompareExact(oldEdge)) {
+                edges.RemoveAt(i);
+                edges.Insert(i, newEdge);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /* Finds all old edges in the list of existing edges in the graph
+     * and replaces them with the new edges.
+     * Returns a bool value indicating wether the replacement took place or not.
+     */
+    public bool Replace(List<Edge> oldEdges, List<Edge> newEdges) {
+        for (int i = 0; i < edges.Count; ++i) {
+            for (int j = 0; j < oldEdges.Count; ++j) {
+                if (edges[i].CompareExact(oldEdges[j])) {
+                    edges.RemoveAt(i);
+                    edges.Insert(i, newEdges[j]);
+                    break;
+                }
+            }
+        }
+        return true;
+    }
+
+
+
+    /* Finds all old edges in the list of existing edges in the graph and removes them.
+     */
+    public void RemoveEdges(List<Edge> edges) {
+        for (int i = 0; i < this.edges.Count; ++i) {
+            for (int j = 0; j < edges.Count; ++j) {
+                if (edges[i].CompareExact(edges[j])) {
+                    edges.RemoveAt(i);
+                    --i;
+                    break;
+                }
+            }
+        }
+    }
+
+    public void AddEdges(List<Edge> edges) {
+        foreach(Edge edge in edges) {
+            AddEdge(edge);
+        }
     }
 
     //--------------------------------------------------------------Accessors-------------------------------------------------------------//
@@ -207,6 +313,32 @@ public class Graph {
         set {
             label = value;
         }
+    }
+
+    /* Compare the given edge to all edges in the graph and 
+     * return the graphs edge upon finding it else return null.
+     */
+    public Edge GetEdge(Edge edge) {
+        foreach (Edge gEdge in edges) {
+            if (edge.CompareExact(gEdge)) {
+                return gEdge;
+            }
+        }
+
+        return null;
+    }
+
+    /* Compare the given nodes to all nodes in the graph and 
+     * return the graphs node upon finding it else return null.
+     */
+    public Node GetNode(Node node) {
+        foreach (Node gNode in nodes) {
+            if (node.CompareExact(gNode)) {
+                return gNode;
+            }
+        }
+
+        return null;
     }
 
     //--------------------------------------------------------Serialization Methods-------------------------------------------------------//

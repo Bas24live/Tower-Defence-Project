@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
+using UnityEngine;
+
 [Serializable]
-public class Production {
+public class Production : MonoBehaviour {
     Graph leftSide, rightSide;
     List<Graph> candidateGraphs;
     string label;
 
+    //------------------------------------------------------------Constructor Methods------------------------------------------------------------//
     public Production(string label) {
         this.label = label;
         leftSide = new Graph();
@@ -22,31 +25,44 @@ public class Production {
         candidateGraphs = new List<Graph>();
     }
 
-    public bool ApplyToRandom() {
-        Random random = new Random();
+    //------------------------------------------------------------Mutator Methods------------------------------------------------------------//
+    public bool ApplyToRandom(Graph host) {
+        System.Random random = new System.Random();
         int i = random.Next(candidateGraphs.Count);
-        return Apply(candidateGraphs[i]);
-
+        return Apply(host, candidateGraphs[i]);
     }
 
-    private bool Apply(Graph candidate) {
-        for (int i = 0; i < leftSide.Nodes.Count; ++i) {
+    private bool Apply(Graph host, Graph candidate) {
+        List<Node> cNodes = candidate.Nodes;
+        List<Edge> cEdges = candidate.Edges;
+        List<Edge> cExternalEdges = candidate.GetExternalEdges(cNodes);
+        
+        //Remove host subgraph internal nodes
+        host.RemoveEdges(cEdges);
+        for (int i = 0; i < cNodes.Count; ++i) {
             Node lNode = leftSide.Nodes[i];
-            Node cNode = candidate.Nodes[i];
-
-            foreach (Edge edge in candidate.Edges) {
-                if (edge.Source == cNode)
-                    edge.Source = lNode;
-                else if (edge.Target == cNode)
-                    edge.Target = lNode;
+            Node cNode = cNodes[i];
+            if (rightSide.DoesNodeExist(lNode)) {
+                host.Replace(cNode, rightSide.GetNode(lNode));
+            } else {
+                host.RemoveNode(cNode);
+                host.CleanEdges(cNode);
             }
         }
 
+        foreach (Node rNode in rightSide.Nodes) {
+            if (!leftSide.DoesNodeExist(rNode)) {
+                host.AddNode(rNode);
+            }
+        }
+
+        //Add new internal nodes from production
+        host.AddEdges(rightSide.Edges);
+
         return true;
-    }
+    }    
 
     //------------------------------------------------------------Accessors Methods------------------------------------------------------------//
-
     public Graph LeftSide {
         get {
             return leftSide;
