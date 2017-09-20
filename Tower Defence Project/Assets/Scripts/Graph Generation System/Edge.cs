@@ -35,7 +35,7 @@ public class Edge : ISerializable {
     }
 
     public bool CompareExact(Edge edge) {
-        return edge.edgeType == edgeType && edge.source.CompareExact(source) && edge.Target.CompareExact(target);
+        return edge.edgeType == edgeType && edge.id == id;
     }
 
     //------------------------------------------------------------Accessors Methods------------------------------------------------------------//

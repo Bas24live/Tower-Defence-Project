@@ -10,7 +10,7 @@ public class GGS {
     private List<Production> productions;
     private List<Production> matchedProductions;
 
-    private int iterations = 5;
+    private int iterations = 2;
 
     protected GGS() {
 
@@ -255,60 +255,65 @@ public class GGS {
 
     //------------------------------------------------------------Gen Productions and Host------------------------------------------------------------//
     private void GenHost() {
-        Node a = new Node("000", "a", "start", new Vector3(0, 0, 0));
-        Node b = new Node("001", "b", "standard", new Vector3(5, 0, 0));
-        Node c = new Node("002", "c", "end", new Vector3(0, 5, 0));
+        Node a = new Node("g00", "a", "start", new Vector3(0, 0, 0));
+        Node b = new Node("g01", "b", "end", new Vector3(5, 0, 0));
 
         host.AddNode(a);
         host.AddNode(b);
-        host.AddNode(c);
 
-        host.AddEdge(new Edge(a, b, "001"));
-        host.AddEdge(new Edge(b, c, "002"));
+        host.AddEdge(new Edge(a, b, "e01"));
     }
 
     private void GenProds() {
-        Node a = new Node("000", "v", "start", new Vector3(0, 0, 0));
-        Node b = new Node("001", "f", "standard", new Vector3(10, 0, 0));
-        Node c = new Node("002", "k", "standard", new Vector3(0, 0, -1));
-
-        Production prod = new Production("Test");
-
-        //Left side of production
-        prod.LeftSide.AddNode(a);
-        prod.LeftSide.AddNode(b);
-        prod.LeftSide.AddEdge(new Edge(a, b, "011"));
-
-        //Right side of production
-        prod.RightSide.AddNode(a);
-        prod.RightSide.AddNode(b);
-        prod.RightSide.AddNode(c);
-
-        prod.RightSide.AddEdge(new Edge(a, b, "011"));
-        prod.RightSide.AddEdge(new Edge(b, c, "012"));
-
-        productions.Add(prod);
-
-        Node f = new Node("000", "f", "standard", new Vector3(13, 0, 0));
-        Node x = new Node("001", "x", "standard", new Vector3(12, 0, 4));
-        Node z = new Node("002", "z", "end", new Vector3(12, 0, 10));
-
-        Production prod2 = new Production("Test2");
-
-        //Left side of production
-        prod2.LeftSide.AddNode(f);
-        prod2.LeftSide.AddNode(z);
-        prod2.LeftSide.AddEdge(new Edge(f, z, "021"));
-
-        //Right side of production
-        prod2.RightSide.AddNode(x);
-        prod2.RightSide.AddNode(f);
-        prod2.RightSide.AddNode(z);
-        prod2.RightSide.AddEdge(new Edge(x, z, "022"));
-        prod2.RightSide.AddEdge(new Edge(x, f, "023"));
-        prod2.RightSide.AddEdge(new Edge(z, f, "024"));
-
-        productions.Add(prod2);
+        productions.Add(Prod_1());
+        productions.Add(Prod_2());
     }
 
+
+    private Production Prod_1() {
+        Node p00 = new Node("p00", "p00", "start", new Vector3(0, 0, 0));
+        Node p01 = new Node("p01", "p01", "standard", new Vector3(2.5f, 0, 5));
+        Node p02 = new Node("p02", "p02", "end", new Vector3(5, 0, 0));
+
+        Production prod_1 = new Production("Produciton 1");
+
+        //Left side of production
+        prod_1.LeftSide.AddNode(p00);
+        prod_1.LeftSide.AddNode(p02);
+        prod_1.LeftSide.AddEdge(new Edge(p00, p02, "e00"));
+
+        //Right side of production
+        prod_1.RightSide.AddNode(p00);
+        prod_1.RightSide.AddNode(p01);
+        prod_1.RightSide.AddNode(p02);
+
+        prod_1.RightSide.AddEdge(new Edge(p00, p02, "e00"));
+        prod_1.RightSide.AddEdge(new Edge(p00, p01, "e01"));
+        prod_1.RightSide.AddEdge(new Edge(p01, p02, "e02"));
+
+        return prod_1;
+    }
+
+    private Production Prod_2() {
+        Node p10 = new Node("p10", "p10", "standard", new Vector3(2.5f, 0, 5));
+        Node p11 = new Node("p11", "p11", "standard", new Vector3(5, 0, -5));
+        Node p12 = new Node("p12", "p12", "end", new Vector3(7.5f, 0, 0));
+
+        Production prod_2 = new Production("Produciton 2");
+
+        //Left side of production
+        prod_2.LeftSide.AddNode(p10);
+        prod_2.LeftSide.AddNode(p12);
+        prod_2.LeftSide.AddEdge(new Edge(p10, p12, "e10"));
+
+        //Right side of production
+        prod_2.RightSide.AddNode(p10);
+        prod_2.RightSide.AddNode(p11);
+        prod_2.RightSide.AddNode(p12);
+
+        prod_2.RightSide.AddEdge(new Edge(p10, p12, "e11"));
+        prod_2.RightSide.AddEdge(new Edge(p11, p12, "e12"));
+
+        return prod_2;
+    }
 }

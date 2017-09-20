@@ -71,6 +71,85 @@ public class Graph {
         return false;
     }
 
+    /* Finds the old node in the list of existing nodes in the graph
+     * once the old node is found it is replaced with the new node.
+     * Returns a bool value indicating wether the replacement took place or not.
+     */
+    public bool Replace(Node oldNode, Node newNode) {
+        foreach (Edge edge in edges) {
+            if (edge.Source.CompareExact(oldNode)) {
+                edge.Source = newNode;
+            }
+            else if (edge.Target.CompareExact(oldNode)) {
+                edge.Target = newNode;
+            }
+        }
+
+        for (int i = 0; i < nodes.Count; ++i) {
+            if (nodes[i].CompareExact(oldNode)) {
+                nodes.RemoveAt(i);
+                nodes.Insert(i, newNode);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /* Finds the old edge in the list of existing edges in the graph
+     * once the old edge is found it is replaced with the new edge.
+     * Returns a bool value indicating wether the replacement took place or not.
+     */
+    public bool Replace(Edge oldEdge, Edge newEdge) {
+        for (int i = 0; i < edges.Count; ++i) {
+            if (edges[i].CompareExact(oldEdge)) {
+                edges.RemoveAt(i);
+                edges.Insert(i, newEdge);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /* Finds all old edges in the list of existing edges in the graph
+     * and replaces them with the new edges.
+     * Returns a bool value indicating wether the replacement took place or not.
+     */
+    public bool Replace(List<Edge> oldEdges, List<Edge> newEdges) {
+        for (int i = 0; i < edges.Count; ++i) {
+            for (int j = 0; j < oldEdges.Count; ++j) {
+                if (edges[i].CompareExact(oldEdges[j])) {
+                    edges.RemoveAt(i);
+                    edges.Insert(i, newEdges[j]);
+                    break;
+                }
+            }
+        }
+        return true;
+    }
+
+    /* Finds all old edges in the list of existing edges in the graph and removes them.
+     */
+    public void RemoveEdges(List<Edge> edges) {
+        for (int i = 0; i < edges.Count; ++i) {
+            for (int j = 0; j < this.edges.Count; ++j) {
+                if (edges[i].CompareExact(this.edges[j])) {
+                    this.edges.RemoveAt(j);
+                    --j;
+                    break;
+                }
+            }
+        }
+    }
+
+    //Add the given list of edges to the hosts current list of edges
+    public void AddEdges(List<Edge> edges) {
+        foreach (Edge edge in edges) {
+            AddEdge(edge);
+        }
+    }
+
     //Remove all nodes from the graph
     public void ClearNodes() {
         nodes.Clear();
@@ -202,86 +281,6 @@ public class Graph {
         }
 
         return false;
-    }
-
-    /* Finds the old node in the list of existing nodes in the graph
-     * once the old node is found it is replaced with the new node.
-     * Returns a bool value indicating wether the replacement took place or not.
-     */
-    public bool Replace(Node oldNode, Node newNode) {
-        foreach (Edge edge in edges) {
-            if (edge.Source.CompareExact(oldNode)) {
-                edge.Source = newNode;
-            }
-            else if (edge.Target.CompareExact(oldNode)) {
-                edge.Target = newNode;
-            }
-        }
-
-        for (int i = 0; i < nodes.Count; ++i) {
-            if (nodes[i].CompareExact(oldNode)) {
-                nodes.RemoveAt(i);
-                nodes.Insert(i, newNode);
-                return true;
-            }
-        }       
-
-        return false;
-    }
-
-    /* Finds the old edge in the list of existing edges in the graph
-     * once the old edge is found it is replaced with the new edge.
-     * Returns a bool value indicating wether the replacement took place or not.
-     */
-    public bool Replace(Edge oldEdge, Edge newEdge) {
-        for (int i = 0; i < edges.Count; ++i) {
-            if (edges[i].CompareExact(oldEdge)) {
-                edges.RemoveAt(i);
-                edges.Insert(i, newEdge);
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /* Finds all old edges in the list of existing edges in the graph
-     * and replaces them with the new edges.
-     * Returns a bool value indicating wether the replacement took place or not.
-     */
-    public bool Replace(List<Edge> oldEdges, List<Edge> newEdges) {
-        for (int i = 0; i < edges.Count; ++i) {
-            for (int j = 0; j < oldEdges.Count; ++j) {
-                if (edges[i].CompareExact(oldEdges[j])) {
-                    edges.RemoveAt(i);
-                    edges.Insert(i, newEdges[j]);
-                    break;
-                }
-            }
-        }
-        return true;
-    }
-
-
-
-    /* Finds all old edges in the list of existing edges in the graph and removes them.
-     */
-    public void RemoveEdges(List<Edge> edges) {
-        for (int i = 0; i < this.edges.Count; ++i) {
-            for (int j = 0; j < edges.Count; ++j) {
-                if (edges[i].CompareExact(edges[j])) {
-                    edges.RemoveAt(i);
-                    --i;
-                    break;
-                }
-            }
-        }
-    }
-
-    public void AddEdges(List<Edge> edges) {
-        foreach(Edge edge in edges) {
-            AddEdge(edge);
-        }
     }
 
     //--------------------------------------------------------------Accessors-------------------------------------------------------------//
