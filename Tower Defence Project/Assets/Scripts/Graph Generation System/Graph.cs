@@ -36,6 +36,16 @@ public class Graph {
         nodes.Add(node);
     }
 
+    //Adds the given node to the list of nodes with a vector adjustment
+    public void AddNode(Node node, List<Vector3> vectors) {
+        Vector3 u = vectors[0];
+        Vector3 v = vectors[1];
+
+        node.Position.X = node.Position.X * u.X + node.Position.X * v.X;
+        node.Position.Z = node.Position.Z * u.Z + node.Position.Z * v.Z;
+        nodes.Add(node);
+    }
+
     /* Removes a given node from the list of nodes in the graph
      * Returns true if the node was found and removed
      * Returns false if the node was not found and removed
@@ -75,7 +85,14 @@ public class Graph {
      * once the old node is found it is replaced with the new node.
      * Returns a bool value indicating wether the replacement took place or not.
      */
-    public bool Replace(Node oldNode, Node newNode) {
+    public bool Replace(Node oldNode, Node newNode, List<Vector3> vectors) {
+        Vector3 u = vectors[0];
+        Vector3 v = vectors[1];
+
+        newNode.Position.X = newNode.Position.X * u.X + newNode.Position.X * v.X;
+        newNode.Position.Z = newNode.Position.Z * u.Z + newNode.Position.Z * v.Z;
+
+
         foreach (Edge edge in edges) {
             if (edge.Source.CompareExact(oldNode)) {
                 edge.Source = newNode;
